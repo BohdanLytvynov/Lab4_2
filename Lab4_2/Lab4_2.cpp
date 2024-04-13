@@ -7,6 +7,7 @@
 #include<crtdbg.h>
 #include<fstream>
 #include<vector>
+#include<algorithm>
 
 namespace lab_funcs
 {
@@ -87,6 +88,17 @@ auto size_validator = [](std::string& str, strings::ukrString& error) ->bool
 	return true;
 };
 
+auto path_input_converter = [](std::string& str)->std::string
+{
+	return str;
+};
+
+auto big_word_predicate = [](const strings::ukrString::Word& left, 
+	const strings::ukrString::Word& right)->bool
+{
+	return right.size() > left.size();
+};
+
 int main()
 {
 	using namespace lab_funcs;
@@ -103,6 +115,8 @@ int main()
 
 	char key;
 
+	char delim[] = { ' ' };
+
 	for (; ;)
 	{
 		key = Input<char, ukrString>(ukrString("\n\nВиберіть опцію:\n \t-1 -> Виконати стандартне завдання. \n\t-2 -> Виконати завдання за варіантом. \n\t-3 -> Вийти з програмии. \n\t-4 -> Повторити цикл."),
@@ -110,7 +124,6 @@ int main()
 
 		ifstream in_file_str;
 		
-
 		switch (key)
 		{
 		case '1':
@@ -126,9 +139,7 @@ int main()
 				int rows = 0;
 				
 				strings::ukrString::wordSet word_array;
-
-				char delim[] = { ' ' };
-
+				
 				//File read cycle
 				while (!in_file_str.eof())
 				{
@@ -155,12 +166,51 @@ int main()
 				{
 					cout << ukrString("В рядку номер ") + ukrString((int)i+1) + ukrString(" Виявлено: ") + ukrString(words_in_each_row[i]) + ukrString(" слова. ") << endl;
 				}
+
+				if (in_file_str.is_open())
+					in_file_str.close();
+
+				words_in_each_row.clear();
+
+				word_array.clear();
 			}
 
 			break;
 		case '2':
 
-			cout << ukrString("Ви вибрали виконання завдання за варіантом.") << endl;
+			cout << ukrString("Ви вибрали виконання завдання за варіантом.\n\tЗнайти у файлі слово максимальної довжини. Якщо файл містить кілька слів однакової максимальної довжини, вивести їх усі") << endl;
+			
+			string path = Input<string, ukrString>(ukrString("Введіть шлях до вашого файлу: "),
+				path_input_converter);
+
+			in_file_str.open(path);
+
+			if (!in_file_str.is_open())
+				cout << ukrString("Невірно вказаний шлях до файлу!") << endl;
+			else
+			{
+				strings::ukrString::wordSet words;
+
+				vector<ukrString> big_words;
+
+				ukrString row;
+
+				int size_of_the_max_word = 0;
+
+				while (!in_file_str.eof())
+				{
+					ukrString::getLine(in_file_str, row);
+
+					ukrString::Split(row, words, delim);
+
+					std::sort(words.begin(), words.end(), big_word_predicate);
+
+
+				}
+
+				if (in_file_str.is_open())
+					in_file_str.close();
+			}
 
 			break;					
 		}
