@@ -159,6 +159,9 @@ int main()
 
 			break;
 		case '2':
+
+			cout << ukrString("Ви вибрали виконання завдання за варіантом.") << endl;
+
 			break;					
 		}
 
