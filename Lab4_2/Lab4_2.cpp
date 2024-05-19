@@ -96,7 +96,7 @@ auto path_input_converter = [](std::string& str)->std::string
 auto big_word_predicate = [](const strings::ukrString::Word& left, 
 	const strings::ukrString::Word& right)->bool
 {
-	return right.size() > left.size();
+	return right.size() < left.size();
 };
 
 int main()
@@ -183,12 +183,18 @@ int main()
 			string path = Input<string, ukrString>(ukrString("Введіть шлях до вашого файлу: "),
 				path_input_converter);
 
+			
+
 			in_file_str.open(path);
 
 			if (!in_file_str.is_open())
 				cout << ukrString("Невірно вказаний шлях до файлу!") << endl;
 			else
 			{
+				strings::ukrString::wordSet find_words;
+
+				strings::ukrString word;
+
 				strings::ukrString::wordSet words;
 
 				vector<ukrString> big_words;
@@ -205,9 +211,38 @@ int main()
 
 					std::sort(words.begin(), words.end(), big_word_predicate);
 
+					for (auto word : words)
+					{
+						if (word.size() > size_of_the_max_word)
+						{
+							size_of_the_max_word = word.size();
 
+							find_words.push_back(word);
+						}
+					}															
 				}
 
+				std::sort(find_words.begin(), find_words.end(), big_word_predicate);
+
+				size_of_the_max_word = 0;
+
+				std::cout << ukrString("Результат обчислень:") << std::endl;
+				std::cout << "\n" << std::endl;
+
+				for (auto word : find_words)
+				{
+					if (word.size() > size_of_the_max_word)
+					{
+						size_of_the_max_word = word.size();
+
+						std::cout << ukrString(word) << std::endl;
+					}
+					else
+					{
+						break;
+					}
+				}
+								
 				if (in_file_str.is_open())
 					in_file_str.close();
 			}
